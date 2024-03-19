@@ -1,3 +1,4 @@
 data/*
 results/*
 gauge-equivariant-mesh-cnn/*
+*.egg-info

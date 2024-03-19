@@ -5,6 +5,9 @@ import torch
 from torch.nn.functional import grid_sample
 from torch_geometric.data import Data
 from torch_geometric.transforms import FaceToEdge
+from gem_cnn.transform.gem_precomp import GemPrecomp
+from gem_cnn.transform.simple_geometry import SimpleGeometry
+from gem_cnn.transform.vector_normals import compute_normals_edges_from_mesh
 from src.utils.general import transform_points
 from src.SIRE.utils import Sphere
 
