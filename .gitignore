@@ -2,3 +2,4 @@ data/*
 results/*
 gauge-equivariant-mesh-cnn/*
 *.egg-info
+**/__pycache__

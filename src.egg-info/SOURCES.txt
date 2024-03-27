@@ -6,3 +6,13 @@ src.egg-info/PKG-INFO
 src.egg-info/SOURCES.txt
 src.egg-info/dependency_links.txt
 src.egg-info/top_level.txt
+src/SIRE/SIRE_filter.py
+src/SIRE/__init__.py
+src/SIRE/models.py
+src/SIRE/transforms.py
+src/SIRE/utils.py
+src/data/__init__.py
+src/data/transforms.py
+src/dijkstra/__init__.py
+src/utils/__init__.py
+src/utils/general.py

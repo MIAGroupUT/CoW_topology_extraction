@@ -2,7 +2,7 @@ import numpy as np
 import yaml
 import torch
 
-def load_model_params(file):
+def load_params(file):
     # load parameters from config.yaml
     np.random.seed(seed=123299)
     with open(file, 'rb') as f:

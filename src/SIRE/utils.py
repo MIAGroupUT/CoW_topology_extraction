@@ -1,5 +1,5 @@
 import numpy as np
-from trimesh import icosphere
+from trimesh.creation import icosphere
 from src.utils.general import cart2spher
 
 class Sphere:

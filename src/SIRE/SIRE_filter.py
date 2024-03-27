@@ -9,7 +9,7 @@ from torch.nn.functional import softmax
 from sklearn.metrics.pairwise import haversine_distances
 from trimesh.creation import icosphere
 
-from src.SIRE.utils import TrackerSphere
+from src.SIRE.utils import Sphere
 from src.utils.general import load_params
 from src.data.transforms import LoadNumpyd, BifNP2Dict
 from src.SIRE.transforms import MakeMultiscaleDataBatch, MakeMultiscaleData, CreateSIREGrid
@@ -40,22 +40,24 @@ class ProcessSIRE3DImage:
                                      n_scales=len(self.params['raylengths']),
                                      n_verts=self.params['nverts'])
         self.GEMTransform = self.get_gem_transform()
+        self.img_transform = self.get_transform()
         
-    def __call__(self, data, filename=None, **params):
+    def __call__(self, data):
         
         # pass in an imagefile, load + scale intensities
         self.img = self.load_img(data)
         
-        self.process_points(filename=filename)
+        self.process_points()
+        return self.img
         
-    def process_points(self, filename=None):        
+    def process_points(self):        
         # process batches of points and determine directions, scales, entropy and maximum activation value
         print(f'No. iterations ', len(torch.split(self.img['grid'], 500)))
         
         #transform gridpoints to voxel coordinates!
         gridpoints = self.img['grid'] #already in voxel coordinates now!!
         
-        sphere = TrackerSphere(subdivisions=self.exp_params['TransformParams']['subdivisions'])
+        sphere = Sphere(subdivisions=self.exp_params['TransformParams']['subdivisions'])
     
         results = {'entropy': [], 'entr_norm': [], 
                    'd1': [], 'd2': [], 
@@ -81,9 +83,9 @@ class ProcessSIRE3DImage:
                 index_vox = np.unravel_index((500*i) + j, self.img['vectorfield'].shape[1:])
                 o = torch.tensor([output['entropy'], output['max_activation'], output['max_scale']])
                 self.img['vectorfield'][:, index_vox[0], index_vox[1], index_vox[2]] = torch.cat([output['d1'], output['d2'], o])
-                    
-        np.save(os.path.join(self.params['resultsdir'], filename + '.npy'),
-                self.img['vectorfield'].numpy())
+
+        # np.save(os.path.join(self.params['resultsdir'], filename + '.npy'),
+        #         self.img['vectorfield'].numpy())
         
 
     def get_direction(self, prediction, sphere):
@@ -153,9 +155,8 @@ class ProcessSIRE3DImage:
                 'max_activation': max_activation,
                 'max_scale': max_scale,
                 'avg_scale': avg_scale}
-        
-    def load_img(self, data, *params):
-        # load image and create SIRE grid already
+    
+    def get_transform(self):
         loader = LoadImaged(keys=['img'], 
                             image_only=False, 
                             allow_missing_keys=True)
@@ -179,7 +180,12 @@ class ProcessSIRE3DImage:
                                         subdivisions=self.exp_params['TransformParams']['subdivisions'],
                                         npoints=self.exp_params['TransformParams']['npoints']) # gem=false because of unequal batch sizes at end of grid
                             ])
-        return transform(data)
+        return transform
+
+        
+    def load_img(self, data):
+        # load image and create SIRE grid
+        return self.img_transform(data)
         
     def load_network(self):
         network = GEMCNN(nverts=self.params['nverts'],
