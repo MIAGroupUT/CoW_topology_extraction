@@ -15,6 +15,7 @@ from src.data.transforms import LoadNumpyd, BifNP2Dict
 from src.SIRE.transforms import MakeMultiscaleDataBatch, MakeMultiscaleData, CreateSIREGrid
 from src.SIRE.models import GEMCNN
 
+
 #import GEM transforms (to make conv in batches correct!)ö
 from gem_cnn.transform.gem_precomp import GemPrecomp
 from gem_cnn.transform.simple_geometry import SimpleGeometry
@@ -46,16 +47,18 @@ class ProcessSIRE3DImage:
         
         # pass in an imagefile, load + scale intensities
         self.img = self.load_img(data)
+        self.img['img'] = self.img['img'].cuda()
+        self.img['onion'] = self.img['onion'].cuda()
         
         self.process_points()
         return self.img
         
     def process_points(self):        
         # process batches of points and determine directions, scales, entropy and maximum activation value
-        print(f'No. iterations ', len(torch.split(self.img['grid'], 500)))
+        print(f'No. iterations ', len(torch.split(self.img['grid'], 1000)))
         
         #transform gridpoints to voxel coordinates!
-        gridpoints = self.img['grid'] #already in voxel coordinates now!!
+        gridpoints = self.img['grid'].cuda() #already in voxel coordinates now!!
         
         sphere = Sphere(subdivisions=self.exp_params['TransformParams']['subdivisions'])
     
@@ -64,17 +67,17 @@ class ProcessSIRE3DImage:
                    'max_activation': [], 
                    'max_scale': [], 'avg_scale': []}
         
-        for i, points in tqdm(enumerate(torch.split(gridpoints, 500))):
-            if i == 0 or len(points) < 500:
+        for i, points in tqdm(enumerate(torch.split(gridpoints, 1000))):
+            if i == 0 or len(points) < 1000:
                 onion_batch_GEM = self.sampler(self.img, points)
-                onion_batch_GEM = self.GEMTransform(onion_batch_GEM)
-
+                onion_batch_GEM = self.GEMTransform(onion_batch_GEM.cpu())
+                onion_batch_GEM.cuda()
             else:
                 onion_batch = self.sampler(self.img, points)
                 onion_batch_GEM.features = onion_batch.features # copy pasta features
                 
             with torch.no_grad():
-                pred_batch = self.network(onion_batch_GEM.cuda()).cpu()             
+                pred_batch = self.network(onion_batch_GEM).cpu()             
                 
             for j in range(points.shape[0]):
                 output = self.process_pred(pred_batch[j * self.params['nverts']: (j+1) * self.params['nverts'], :], sphere)
@@ -175,7 +178,7 @@ class ProcessSIRE3DImage:
                                                             b_min=0., b_max=1.,
                                                             clip=True),
                             MakeMultiscaleData(self.params['raylengths'], 
-                                         GEMGCN=False,
+                                        GEMGCN=False,
                                         measure=self.params['measure'],
                                         subdivisions=self.exp_params['TransformParams']['subdivisions'],
                                         npoints=self.exp_params['TransformParams']['npoints']) # gem=false because of unequal batch sizes at end of grid

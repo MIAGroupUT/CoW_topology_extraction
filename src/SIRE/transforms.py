@@ -29,7 +29,7 @@ class MakeMultiscaleDataBatch(Transform):
         
         rays = rays + centers_stacked
         # normalize rays to [-1, 1] domain
-        rays = (rays * (2 / torch.flip(torch.tensor(data['img'].shape), dims=[0])) - 1).float()
+        rays = (rays * (2 / torch.flip(torch.tensor(data['img'].shape).cuda(), dims=[0])) - 1).float()
 
         onion = copy.deepcopy(data['onion'])
 
@@ -38,7 +38,7 @@ class MakeMultiscaleDataBatch(Transform):
         
         # fix pos and faces for batching!!
         onion.pos = torch.tile(onion.pos, [n_centers, 1])
-        addto = torch.repeat_interleave(torch.arange(n_centers) * self.n_verts * self.n_scales, onion.face.shape[1], dim=0)
+        addto = torch.repeat_interleave(torch.arange(n_centers) * self.n_verts * self.n_scales, onion.face.shape[1], dim=0).cuda()
         onion.face = torch.tile(onion.face, [1, n_centers]) 
         onion.face += addto
         return onion
