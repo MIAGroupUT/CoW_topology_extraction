@@ -2,18 +2,21 @@ import numpy as np
 import yaml
 import torch
 
+
 def load_params(file):
     # load parameters from config.yaml
     np.random.seed(seed=123299)
-    with open(file, 'rb') as f:
+    with open(file, "rb") as f:
         conf = yaml.safe_load(f.read())
     f.close()
     return conf
+
 
 def transform_points(points, affine):
     # transform points from one coordinate system to another through affine
     points = np.concatenate([points, np.ones([points.shape[0], 1])], axis=1).T
     return (affine @ points).T[:, :-1]
+
 
 def spher2cart(spher_coords):
     # transform an Nx3 matrix of (unit length) Spherical coordinates [r, phi, theta] into an Nx3 matrix with [x,y,z] Cartesian coordinates.
@@ -51,3 +54,35 @@ def cart2spher(cart_coords):
     coords_spherical[:, 1] = phi
     coords_spherical[:, 2] = theta
     return coords_spherical
+
+
+def save_mevislab_markerfile(markers, targetfile):
+    f = open(targetfile, "w")
+    print(r'<?xml version="1.0" encoding="UTF-8" standalone="no" ?>', file=f)
+    print(r"<MeVis-XML-Data-v1.0>" + "\n", file=f)
+    print(r'  <XMarkerList BaseType="XMarkerList" Version="1">', file=f)
+    print(r'    <_ListBase Version="0">', file=f)
+    print(r"      <hasPersistance>1</hasPersistance>", file=f)
+    print(r"      <currentIndex>9</currentIndex>", file=f)
+    print(r"    </_ListBase>", file=f)
+    print(r"    <ListSize>" + str(markers.shape[0]) + "</ListSize>", file=f)
+    print(r"    <ListItems>", file=f)
+    for pt in range(markers.shape[0]):
+        print(r'      <Item Version="0">', file=f)
+        print(r'        <_BaseItem Version="0">', file=f)
+        print(r"          <id>" + str(pt + 1) + "</id>", file=f)
+        print(r"        </_BaseItem>", file=f)
+        print(
+            r"        <pos>"
+            + str(markers[pt][0])
+            + " "
+            + str(markers[pt][1])
+            + " "
+            + str(markers[pt][2])
+            + r" 0 0 0</pos>",
+            file=f,
+        )
+        print(r"      </Item>", file=f)
+    print(r"    </ListItems>", file=f)
+    print(r"  </XMarkerList>" + "\n", file=f)
+    print(r"</MeVis-XML-Data-v1.0>", file=f)

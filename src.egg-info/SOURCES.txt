@@ -14,5 +14,7 @@ src/SIRE/utils.py
 src/data/__init__.py
 src/data/transforms.py
 src/dijkstra/__init__.py
+src/dijkstra/shortest_path.py
+src/dijkstra/transforms.py
 src/utils/__init__.py
 src/utils/general.py
