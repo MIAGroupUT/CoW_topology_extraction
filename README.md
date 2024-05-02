@@ -30,10 +30,16 @@ Data is stored in the `/data` directory, with the following structure:
         /<Patient ID>.npy
     /sire-weights
         /model-weights.pt
+        /train.yml
 ```
-SIRE model weights can be downloaded from [here](https://surfdrive.surf.nl/files/index.php/s/wmQLFBQkFNVWAyQ).
+SIRE model weights and the parameters in `/train.yml` can be downloaded from [here](https://surfdrive.surf.nl/files/index.php/s/wmQLFBQkFNVWAyQ).
 
 ## Usage
 The code for automatic topology extraction is in `/scripts/extract_topology.py`. Patient ID and parameters are hardcoded in this script and can be changed there.
+The figure below gives an overview of the method. `extract_topology.py` saves both the paths found by Dijkstra's algorithm (as a dictionary where the world-coordinates can be accessed through the key `'world'`). This script also saves the result of the SIRE preprocessing filter as a 9D vectorfield, with the following contents:
+$[D_1(x), D_1(y), D_1(z), D_2(x), D_2(y), D_2(z), \text{entropy}, \text{max activation}, \text{max scale}]$.
 
-![alt](/CoW_Topology_Extraction/method.png)
+![alt](method.png)
+
+## Results
+Results are automatically saved in the `/results` folder after running the 
