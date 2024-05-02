@@ -42,4 +42,4 @@ $[D_1(x), D_1(y), D_1(z), D_2(x), D_2(y), D_2(z), \text{entropy}, \text{max acti
 ![alt](method.png)
 
 ## Results
-Results are automatically saved in the `/results` folder after running the 
+Results are automatically saved in the `/results` folder after running `/scripts/extract_topology.py`. The SIRE vectorfields are saved as `.npy` files in `/results/SIRE_filtered` and a minimal intensity projection as well as the coordinates of the paths are saved as `.png` and `.pkl` files respectively under `/results/paths`.
