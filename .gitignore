@@ -1,6 +1,9 @@
 data/*
-results/*
+results/paths/*
+results/SIRE_filtered/*
 build/*
 gauge-equivariant-mesh-cnn/*
 *.egg-info
 **/__pycache__
+
+!*.gitkeep
