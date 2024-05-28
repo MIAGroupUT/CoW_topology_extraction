@@ -1,9 +1,8 @@
-# Anatomically Robust Extraction of Personalized Circle of Willis Topology from 3D TOF-MRA Scans
+# Deep-learning based extraction of circle of Willis topology with anatomical priors
 
-This is the repository of our paper Anatomically Robust Extraction of Personalized Circle of Willis Topology from 3D TOF-MRA Scans.\
-Our paper is currently under review for MIDL 2024, the code will be released publicly upon acceptance.
+This is the code repository of our paper _Deep-learning based extraction of circle of Willis Topology with anatomical priors_.
 
-Link to the paper on [OpenReview](<https://openreview.net/forum?id=Qop6HhcS0g&referrer=%5BAuthor%20Console%5D(%2Fgroup%3Fid%3DMIDL.io%2F2024%2FConference%2FAuthors%23your-submissions>)
+We extract a graph representation from the circle of Willis topology from 3D TOF-MRA scans. A complete circle of Willis is used as an anatomical prior of these graphs. Therefore, we connect automatically detected bifurcation points in these scans using a shortest path algorithm, that depends on a cost function $\mathcal{C}$ based on local artery orientations. These local artery orientations are obtained through a deep-learning based, scale-invariant, rotation-equivariant estimator that operates on local image data [(SIRE)](https://arxiv.org/abs/2311.05400).
 
 ## Environment
 The conda environment can be created through the `environment.yml` file:\
